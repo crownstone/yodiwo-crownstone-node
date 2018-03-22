@@ -8,16 +8,17 @@ from CrownstoneYodiwo.lib.ports.InputPorts import InputPorts
 from CrownstoneYodiwo.lib.ports.OutputPorts import OutputPorts
 
 
-class CrownstoneSphereController:
+class CrownstoneDataStore:
     bluenet = None
+    sendMethod = None
     
     
-    def __init__(self, stoneId, bluenet):
+    def __init__(self, stoneId, bluenet, sendMethod):
         self.stoneId = stoneId
         self.bluenet = bluenet
+        self.sendMethod = sendMethod
         
         self.thingKey = THING_ID_BASE_NAME + str(stoneId)
-    
     
     
     def setupEventStream(self):

@@ -3,35 +3,32 @@ from Yodiwo import Port, ConfigParameter, Thing, ThingUIHints
 from Yodiwo.Enums import PortConfig, PortTypes, IODirection
 from Yodiwo.lib.plegma.Messages import PortEvent
 
-from CrownstoneYodiwo.lib.CrownstoneYodiwoNode import THING_ID_BASE_NAME
-from CrownstoneYodiwo.lib.ports.InputPorts import InputPorts
-from CrownstoneYodiwo.lib.ports.OutputPorts import OutputPorts
-
+from CrownstoneYodiwo.lib.SharedVariables      import THING_ID_BASE_NAME
+from CrownstoneYodiwo.lib.ports.InputPorts     import InputPorts
+from CrownstoneYodiwo.lib.ports.OutputPorts    import OutputPorts
 
 class Crownstone:
-    stoneId = None
-    bluenet = None
+    stoneId    = None
+    stoneData  = None
+    bluenet    = None
     sendMethod = None
     
-    def __init__(self, stoneId, bluenet, sendMethod):
-        self.stoneId = stoneId
-        self.bluenet = bluenet
-        self.sendMethod = sendMethod
-        
-        self.thingKey = THING_ID_BASE_NAME + str(stoneId)
+    def __init__(self, stoneData, bluenet):
+        self.stoneId   = stoneData['id']
+        self.stoneData = stoneData
+        self.bluenet   = bluenet
+        self.thingKey  = THING_ID_BASE_NAME + str(self.stoneId )
         
 
     def setupEventStream(self):
         bluenetEventBus = self.bluenet.getEventBus()
-        bluenetTopics = self.bluenet.getTopics()
+        bluenetTopics   = self.bluenet.getTopics()
     
         bluenetEventBus.subscribe(bluenetTopics.powerUsageUpdate, self._updatePowerMeasurement)
 
     def _updatePowerMeasurement(self, data):
         msg = [PortEvent(self.thingKey + "-" + OutputPorts.powerUsage, str(data["powerUsage"]), None)]
-        self.sendMethod(msg)
-    
-        
+        # self.sendMethod(msg)
 
     def handleCommand(self, command, payload):
         if command == InputPorts.switch:
@@ -62,15 +59,14 @@ class Crownstone:
         inputPortList = []
         inputPortList.append(
             Port(
-                self.thingKey + "-" + InputPorts.switch,    # portkey
+                self.thingKey + "-" + InputPorts.switch.value,    # portkey
                 "Switch Crownstone", # name
                 "Provide a value [0 or 1] to switch the Crownstone off or on", # description
                 IODirection.Input,  # io direction
                 PortTypes.Decimal,  # type
                 0,                  # state     (?)
                 0,                  # revNum    (?)
-                3,                  # confFlags (?)
-                ePortConfig=PortConfig.NONE
+                3                   # confFlags (?)
             )
         )
         
@@ -81,15 +77,14 @@ class Crownstone:
         outputPortList = []
         outputPortList.append(
             Port(
-                self.thingKey + "-" + OutputPorts.powerUsage,  # portkey
+                self.thingKey + "-" + OutputPorts.powerUsage.value,  # portkey
                 "Power measurement in W",  # name
                 "Event of power measurements of this Crownstone",  # description
                 IODirection.Output,  # io direction
                 PortTypes.Decimal,   # type
                 0,                   # state     (?)
                 0,                   # revNum    (?)
-                3,                   # confFlags (?)
-                ePortConfig=PortConfig.NONE
+                3                    # confFlags (?)
             )
         )
         

@@ -1,102 +1,101 @@
-from Yodiwo import NodeService, Converter
-from Yodiwo.lib.plegma.Messages import PortEventMsg, PortEvent
+from BluenetLib._EventBusInstance import BluenetEventBus
+from BluenetLib.lib.util.JsonFileStore import JsonFileStore
+from Yodiwo.lib import PyNodeHelper
 
 from BluenetLib import Bluenet
+from BluenetLib import Topics as BluenetTopics
 
 from CrownstoneYodiwo.lib.Crownstone import Crownstone
+from CrownstoneYodiwo.lib.CrownstoneNodeService import CrownstoneNodeService
+from CrownstoneYodiwo.lib.SharedVariables import THING_ID_BASE_NAME
 
-THING_ID_BASE_NAME = "crownstoneThing-"
 
 def getPortKey(key):
     arr = key.split("-")
     return arr[-1]
 
 
-class CrownstoneYodiwoNode(NodeService):
+class CrownstoneYodiwoNode:
     indexedCrownstoneIds = []
-    masterThing = None
-    bluenet = None
+    masterThing          = None
+    bluenet              = None
+    bluenetCloud         = None
+    bluenetCloudSphere   = None
     
-    def __init__(self, bluenet):
-        super().__init__()
-        self.bluenet = bluenet
+    nodeService          = None
+    
+    def __init__(self):
+        self.bluenet = Bluenet(catchSIGINT=False)
+        self.bluenetCloud = self.bluenet.getCloud()
         
+        
+    def loadConfig(self, path):
+        fileReader = JsonFileStore(path)
+        data = fileReader.getData()
+        
+        csUser = data["crownstoneUser"]
+        
+        self.bluenetCloud.setUserInformation(
+            email=csUser["email"],
+            password=csUser["password"],
+            sha1Password=csUser["sha1Password"],
+            accessToken=csUser["accessToken"]
+        )
+        
+        if "sphereId" in csUser and csUser["sphereId"] != "":
+            self.bluenetCloudSphere = self.bluenetCloud.getSphereHandler(csUser["sphereId"])
+        elif "sphereName" in csUser and csUser["sphereName"] != "":
+            self.bluenetCloudSphere = self.bluenetCloud.getSphereHandlerByName(csUser["sphereName"])
+
+        if self.bluenetCloudSphere is None:
+            raise Exception("Sphere not found in cloud, check the id or name.")
+        
+        # download stones for bluenet
+        self.bluenetCloudSphere.getStones()
+        
+        # init Crownstone USB
+        self.bluenet.initializeUSB(data["bluenet"]["usbPort"])
+        
+        # init Yodiwo Service
+        yodiwoData = data["yodiwoUser"]
+        yodiwoConfig = PyNodeHelper.ConfigContainer()
+        yodiwoConfig.setData(yodiwoData)
+        self.nodeService = CrownstoneNodeService(yodiwoConfig)
+        
+        
+    def start(self):
         self.initAvailableStones()
         self.enableDynamicCreation()
+        self.nodeService.start()
         
 
     def initAvailableStones(self):
-        availableCrownstoneIds = Bluenet.getAvailableStoneIds()
-        thingsDict = self.createThingsDict(availableCrownstoneIds)
-        self.registerCrownstones(thingsDict)
+        availableCrownstonesDict = self.bluenet.getCrownstones()
+        arrayOfStoneDicts = []
+        for stoneId, stoneData in availableCrownstonesDict.items():
+            arrayOfStoneDicts.append(stoneData)
+        
+        thingsDict = self.createThingsDict(arrayOfStoneDicts)
+        self.nodeService.registerCrownstones(thingsDict)
 
     def enableDynamicCreation(self):
         # subscribe to new crownstone found ids.
-        eventBus = self.bluenet.getEventBus()
-        topics = self.bluenet.getTopics()
-        eventBus.subscribe(topics.newCrownstoneFound, self.handleNewCrownstone)
+        BluenetEventBus.subscribe(BluenetTopics.crownstoneAvailable, self.handleNewCrownstone)
         
         
-    def createThingsDict(self, crownstoneIds):
+    def createThingsDict(self, crownstoneDictionary):
         thingsDict = {}
-        for stoneId in crownstoneIds:
-            if stoneId not in self.indexedCrownstoneIds:
-                stone = Crownstone(stoneId, self.bluenet, lambda msg: self._sendMessage(msg))
-                thingsDict[(THING_ID_BASE_NAME + str(stoneId))] = stone.getThing()
-                self.indexedCrownstoneIds.append(stoneId)
+        for stone in crownstoneDictionary:
+            if stone['id'] not in self.indexedCrownstoneIds:
+                cs = Crownstone(stone, self.bluenet)
+                key = THING_ID_BASE_NAME + str(stone['id'])
+                thingsDict[key] = cs.getThing()
+                self.indexedCrownstoneIds.append(stone['id'])
     
         return thingsDict
         
         
     def handleNewCrownstone(self,stoneId):
         thingsDict = self.createThingsDict([stoneId])
-        self.registerCrownstones(thingsDict)
+        self.nodeService.registerCrownstones(thingsDict)
         
-        
-    def registerCrownstones(self, things):
-        """
-        Import things and post them to Yodiwo. This is a dict of Things, with key being the thingKey
-        """
-        self.ImportThings(things)
-        
-
-    def HandlePortEventMsg(self, msg):
-        """
-        This method handles incoming messages. These are events on input ports.
-        """
-        self._receiveMessage(msg)
-            
-    def _receiveMessage(self, msg):
-        for portevent in msg.PortEvents:
-            selectedPort = None
-            
-            portevent = PortEvent(**portevent)
-            pk = portevent.PortKey
-            thingKey = Converter.PortkeyToThingkey(pk)
-            thing = self._Things[thingKey]
-            for p in thing.Ports:
-                if p.PortKey == pk:
-                    p.State = portevent.State
-                    selectedPort = getPortKey(pk)
-                    break
-        
-            thingKeyExpanded = thingKey.split(THING_ID_BASE_NAME)
-        
-            # if there is not a single result, we can't parse this key
-            if len(thingKeyExpanded) != 1:
-                print("Invalid key:", thingKey, thingKeyExpanded)
-                continue
-        
-            # use the selectedPort to trigger an action
-            if thingKeyExpanded[0] == "SphereController":
-                # get the crownstone we want to control based on the message stoneId
-                pass
-            else:
-                pass
-
-    def _sendMessage(self, msg):
-        sequenceNumber = 1
-        retries = 2
-    
-        message = PortEventMsg(sequenceNumber, msg)
-        self.mqttclient.SendMsg(message, retries)  # send data to external

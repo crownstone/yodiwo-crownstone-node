@@ -1,8 +1,10 @@
+from CrownstoneYodiwo.lib.Topics.Topics import Topics
+
+from CrownstoneYodiwo._EventBusInstance import CSEventBus
 from Yodiwo import NodeService, Converter
 from Yodiwo.lib import PyNodeHelper
 from Yodiwo.lib.plegma.Messages import PortEventMsg, PortEvent
 
-from CrownstoneYodiwo.lib.SharedVariables import THING_ID_BASE_NAME
 
 
 def getPortKey(key):
@@ -17,7 +19,7 @@ class CrownstoneNodeService(NodeService):
     def __init__(self, config):
         super().__init__(config)
         
-    def registerCrownstones(self, things):
+    def registerThings(self, things):
         """
         Import things and post them to Yodiwo. This is a dict of Things, with key being the thingKey
         """
@@ -31,6 +33,7 @@ class CrownstoneNodeService(NodeService):
         self._receiveMessage(msg)
 
     def start(self):
+        CSEventBus.subscribe(Topics.sendMessage, self._sendMessage)
         self.Start(PyNodeHelper.eMessagingProtocol.Mqtt)
 
     def _receiveMessage(self, msg):
@@ -46,20 +49,10 @@ class CrownstoneNodeService(NodeService):
                     p.State = portevent.State
                     selectedPort = getPortKey(pk)
                     break
-        
-            thingKeyExpanded = thingKey.split(THING_ID_BASE_NAME)
-        
-            # if there is not a single result, we can't parse this key
-            if len(thingKeyExpanded) != 1:
-                print("Invalid key:", thingKey, thingKeyExpanded)
-                continue
-        
-            # use the selectedPort to trigger an action
-            if thingKeyExpanded[0] == "SphereController":
-                # get the crownstone we want to control based on the message stoneId
-                pass
-            else:
-                pass
+
+            CSEventBus.emit(Topics.receivedMessage, {"thingKey":thingKey, "port": selectedPort, "payload":portevent.State})
+            
+            
 
     def _sendMessage(self, msg):
         sequenceNumber = 1

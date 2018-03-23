@@ -1,9 +1,14 @@
-from BluenetLib import Bluenet
+from BluenetLib import Bluenet, BluenetEventBus
+from CrownstoneYodiwo.lib.ports.CombinedPorts import CombinedPorts
+
+from CrownstoneYodiwo._EventBusInstance import CSEventBus
+
+from CrownstoneYodiwo.lib.Topics.Topics import Topics
 from Yodiwo import Port, ConfigParameter, Thing, ThingUIHints
 from Yodiwo.Enums import PortConfig, PortTypes, IODirection
 from Yodiwo.lib.plegma.Messages import PortEvent
+from BluenetLib import Topics as BluenetTopics
 
-from CrownstoneYodiwo.lib.SharedVariables      import THING_ID_BASE_NAME
 from CrownstoneYodiwo.lib.ports.InputPorts     import InputPorts
 from CrownstoneYodiwo.lib.ports.OutputPorts    import OutputPorts
 
@@ -11,38 +16,54 @@ class Crownstone:
     stoneId    = None
     stoneData  = None
     bluenet    = None
-    sendMethod = None
+    thingKey   = None
     
-    def __init__(self, stoneData, bluenet):
+    def __init__(self, thingKey, stoneData, bluenet):
         self.stoneId   = stoneData['id']
         self.stoneData = stoneData
         self.bluenet   = bluenet
-        self.thingKey  = THING_ID_BASE_NAME + str(self.stoneId )
+        self.thingKey  = thingKey
+        
+        self.setupEventStream()
         
 
     def setupEventStream(self):
-        bluenetEventBus = self.bluenet.getEventBus()
-        bluenetTopics   = self.bluenet.getTopics()
-    
-        bluenetEventBus.subscribe(bluenetTopics.powerUsageUpdate, self._updatePowerMeasurement)
+        CSEventBus.subscribe(Topics.receivedMessage, self.handleCommand)
+        BluenetEventBus.subscribe(BluenetTopics.powerUsageUpdate, self._updatePowerMeasurement)
+        BluenetEventBus.subscribe(BluenetTopics.crownstoneAvailable, self._updateAvailable)
 
     def _updatePowerMeasurement(self, data):
-        msg = [PortEvent(self.thingKey + "-" + OutputPorts.powerUsage, str(data["powerUsage"]), None)]
-        # self.sendMethod(msg)
+        if str(data['id']) == str(self.stoneId):
+            msg = [PortEvent(self.thingKey + "-" + OutputPorts.powerUsage.value, str(data["powerUsage"]), None)]
+            CSEventBus.emit(Topics.sendMessage, msg)
+            
+    def _updateAvailable(self, data):
+        if str(data['id']) == str(self.stoneId):
+            self.stoneData = data
+            msg = [PortEvent(self.thingKey + "-" + CombinedPorts.isAvailable.value, self.stoneData["available"], None)]
+            CSEventBus.emit(Topics.sendMessage, msg)
 
-    def handleCommand(self, command, payload):
-        if command == InputPorts.switch:
-            # todo parse payload
-            Bluenet.switchCrownstone(self.stoneId, payload)
+    def handleCommand(self, data):
+        thingKey = data["thingKey"]
+        port = data["port"]
+        payload = data["payload"]
+
+        if self.thingKey == thingKey:
+            if port == InputPorts.switch.value:
+                Bluenet.switchCrownstone(self.stoneId, float(payload) == 1)
+            elif port == CombinedPorts.isAvailable.value:
+                if bool(payload):
+                    self._updateAvailable(self.stoneData)
 
     def getThing(self):
         ports = []
         ports += self._generateInputPorts()
         ports += self._generateOutputPorts()
+        ports += self._generateCombinedPorts()
         
         return Thing(
             self.thingKey,
-            "Crownstone " + str(self.stoneId),
+            self.stoneData["name"] + " (#" + str(self.stoneId) + ")",
             [ConfigParameter("Crownstone Thing", "test")],
             ports,
             "com.yodiwo.text.default",
@@ -64,13 +85,30 @@ class Crownstone:
                 "Provide a value [0 or 1] to switch the Crownstone off or on", # description
                 IODirection.Input,  # io direction
                 PortTypes.Decimal,  # type
-                0,                  # state     (?)
-                0,                  # revNum    (?)
-                3                   # confFlags (?)
+                0,                  # initial state
+                0,                  # revNum            (?)
+                3                   # ePortConf enum    (?)
             )
         )
         
         return inputPortList
+
+    def _generateCombinedPorts(self):
+        combinedPortList = []
+        combinedPortList.append(
+            Port(
+                self.thingKey + "-" + CombinedPorts.isAvailable.value,  # portkey
+                "Available",  # name
+                "Check if a Crownstone is Available to use via the Mesh",  # description
+                IODirection.InputOutput,  # io direction
+                PortTypes.Boolean,  # type
+                False,  # state     (?)
+                0,  # revNum    (?)
+                3  # confFlags (?)
+            )
+        )
+    
+        return combinedPortList
         
 
     def _generateOutputPorts(self):
@@ -81,10 +119,10 @@ class Crownstone:
                 "Power measurement in W",  # name
                 "Event of power measurements of this Crownstone",  # description
                 IODirection.Output,  # io direction
-                PortTypes.Decimal,   # type
-                0,                   # state     (?)
-                0,                   # revNum    (?)
-                3                    # confFlags (?)
+                PortTypes.Decimal,   # data type
+                0,                   # initial state
+                0,                   # revNum            (?)
+                3                    # ePortConf enum    (?)
             )
         )
         

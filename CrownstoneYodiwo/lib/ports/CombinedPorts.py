@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class CombinedPorts(Enum):
-    pass
-
-
+    GetSwitchState = "GetSwitchState"
+    GetPowerUsage  = "GetSwitchState"
+    
+    isAvailable    = "isAvailable"

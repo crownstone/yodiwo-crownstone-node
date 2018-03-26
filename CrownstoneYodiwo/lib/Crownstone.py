@@ -29,12 +29,16 @@ class Crownstone:
 
     def setupEventStream(self):
         CSEventBus.subscribe(Topics.receivedMessage, self.handleCommand)
-        BluenetEventBus.subscribe(BluenetTopics.powerUsageUpdate, self._updatePowerMeasurement)
+        BluenetEventBus.subscribe(BluenetTopics.powerUsageUpdate,    self._updatePowerMeasurement)
         BluenetEventBus.subscribe(BluenetTopics.crownstoneAvailable, self._updateAvailable)
 
-    def _updatePowerMeasurement(self, data):
-        if str(data['id']) == str(self.stoneId):
-            msg = [PortEvent(self.thingKey + "-" + OutputPorts.powerUsage.value, str(data["powerUsage"]), None)]
+    def _updatePowerMeasurement(self, bluenetData):
+        """
+        :param bluenetData: data dict from bluenet {'crownstoneId': number, 'powerUsage': float}
+        :return:
+        """
+        if str(bluenetData['id']) == str(self.stoneId):
+            msg = [PortEvent(self.thingKey + "-" + OutputPorts.powerUsage.value, str(max(0.0,float(bluenetData["powerUsage"]))), None)]
             CSEventBus.emit(Topics.sendMessage, msg)
             
     def _updateAvailable(self, data):
@@ -50,7 +54,7 @@ class Crownstone:
 
         if self.thingKey == thingKey:
             if port == InputPorts.switch.value:
-                Bluenet.switchCrownstone(self.stoneId, float(payload) == 1)
+                self.bluenet.switchCrownstone(self.stoneId, float(payload) == 1)
             elif port == CombinedPorts.isAvailable.value:
                 if bool(payload):
                     self._updateAvailable(self.stoneData)
@@ -66,7 +70,7 @@ class Crownstone:
             self.stoneData["name"] + " (#" + str(self.stoneId) + ")",
             [ConfigParameter("Crownstone Thing", "test")],
             ports,
-            "com.yodiwo.text.default",
+            "com.crownstone.crownstone",
             None,
             False,
             ThingUIHints(

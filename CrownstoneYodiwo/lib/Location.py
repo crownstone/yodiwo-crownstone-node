@@ -28,34 +28,33 @@ class Location:
 
     def setupEventStream(self):
         BluenetEventBus.subscribe(BluenetTopics.personEnteredLocation, self._handlePersonEnter)
-        BluenetEventBus.subscribe(BluenetTopics.personLeftLocation, self._handlePersonExit)
+        BluenetEventBus.subscribe(BluenetTopics.personLeftLocation,    self._handlePersonExit)
+    
     
     def _handlePersonEnter(self, data):
         if str(data["locationId"]) == str(self.locationId):
-            msg = [PortEvent(self.thingKey + "-" + OutputPorts.personEnter, json.dumps(data), None)]
+            msg = [PortEvent(self.thingKey + "-" + OutputPorts.personEnter.value, json.dumps(data), None)]
             CSEventBus.emit(Topics.sendMessage, msg)
+    
     
     def _handlePersonExit(self, data):
         if str(data["locationId"]) == str(self.locationId):
-            msg = [PortEvent(self.thingKey + "-" + OutputPorts.personExit, json.dumps(data), None)]
+            msg = [PortEvent(self.thingKey + "-" + OutputPorts.personExit.value, json.dumps(data), None)]
             CSEventBus.emit(Topics.sendMessage, msg)
-    
-    def handleCommand(self, command, payload):
-        pass
-
+            
+            
     def getThing(self):
         ports = []
         ports += self._generateInputPorts()
         ports += self._generateOutputPorts()
         ports += self._generateCombinedPorts()
         
-        print("ROOM KEY", self.thingKey)
         return Thing(
             self.thingKey,
             self.locationData["name"] + " (#" + str(self.locationId) + ")",
             [ConfigParameter("Location Thing", "test")],
             ports,
-            "com.yodiwo.text.default",
+            "com.crownstone.location",
             None,
             False,
             ThingUIHints(

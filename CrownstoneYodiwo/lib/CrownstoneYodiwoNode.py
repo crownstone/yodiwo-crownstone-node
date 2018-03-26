@@ -5,6 +5,7 @@ from Yodiwo.lib import PyNodeHelper
 from BluenetLib import Bluenet
 from BluenetLib import Topics as BluenetTopics
 
+from CrownstoneYodiwo.lib.SphereController import SphereController
 from CrownstoneYodiwo.lib.Crownstone import Crownstone
 from CrownstoneYodiwo.lib.CrownstoneNodeService import CrownstoneNodeService
 from CrownstoneYodiwo.lib.Location import Location
@@ -18,6 +19,9 @@ def getPortKey(key):
 class CrownstoneYodiwoNode:
     indexedCrownstoneIds = []
     indexedLocationIds   = []
+    
+    registeredThings     = {}
+    
     masterThing          = None
     bluenet              = None
     bluenetCloud         = None
@@ -58,6 +62,7 @@ class CrownstoneYodiwoNode:
         self.bluenetCloudSphere.getStones()
         
         self.sphereData = self.bluenetCloudSphere.getSphereData()
+        self.bluenetCloudSphere.startPollingPresence()
         
         # init Crownstone USB
         self.bluenet.initializeUSB(data["bluenet"]["usbPort"])
@@ -71,6 +76,7 @@ class CrownstoneYodiwoNode:
         
         
     def start(self):
+        self.initSphereController(self.sphereData['cloudId'], self.sphereData)
         self.initLocations()
         self.initAvailableStones()
         self.enableDynamicCreation()
@@ -79,15 +85,14 @@ class CrownstoneYodiwoNode:
 
     def initLocations(self):
         avaliableLocations = self.bluenetCloudSphere.getLocations()
-        thingsDict = {}
         for location in avaliableLocations:
             if location['id'] not in self.indexedLocationIds:
                 thingKey = self.yodiwoConfig.nodekey.toString() + '-L' + str(location['id'])
                 loc = Location(thingKey, location, self.bluenet)
-                thingsDict[thingKey] = loc.getThing()
+                self.registeredThings[thingKey] = loc.getThing()
                 self.indexedLocationIds.append(location['id'])
 
-        self.nodeService.registerThings(thingsDict)
+        self.nodeService.registerThings(self.registeredThings)
         
 
     def initAvailableStones(self):
@@ -96,13 +101,15 @@ class CrownstoneYodiwoNode:
         for stoneId, stoneData in availableCrownstonesDict.items():
             arrayOfStoneDicts.append(stoneData)
         
-        thingsDict = self.createThingsDict(arrayOfStoneDicts)
+        self.addToThingsDict(arrayOfStoneDicts, self.registeredThings)
         
-        self.nodeService.registerThings(thingsDict)
+        self.nodeService.registerThings(self.registeredThings)
         
-    def initSphereController(self):
-        pass
-    
+    def initSphereController(self, sphereId, sphereData):
+        thingKey = self.yodiwoConfig.nodekey.toString() + '-SPHERE:' + str(sphereId)
+        controller = SphereController(thingKey, sphereData, self.bluenet)
+        self.registeredThings[thingKey] = controller.getThing()
+
     def initDataStore(self):
         pass
 
@@ -111,19 +118,16 @@ class CrownstoneYodiwoNode:
         BluenetEventBus.subscribe(BluenetTopics.crownstoneAvailable, self.handleNewCrownstone)
         
         
-    def createThingsDict(self, crownstoneArray):
-        thingsDict = {}
+    def addToThingsDict(self, crownstoneArray, thingsDict):
         for stone in crownstoneArray:
             if stone['id'] not in self.indexedCrownstoneIds:
                 thingKey = self.yodiwoConfig.nodekey.toString() + '-CS' + str(stone['id'])
                 cs = Crownstone(thingKey, stone, self.bluenet)
                 thingsDict[thingKey] = cs.getThing()
                 self.indexedCrownstoneIds.append(stone['id'])
-    
-        return thingsDict
         
         
     def handleNewCrownstone(self,stoneId):
-        thingsDict = self.createThingsDict([stoneId])
-        self.nodeService.registerThings(thingsDict)
+        self.addToThingsDict([stoneId], self.registeredThings)
+        self.nodeService.registerThings(self.registeredThings)
         

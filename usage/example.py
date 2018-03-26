@@ -1,6 +1,6 @@
-from CrownstoneYodiwo.lib.CrownstoneYodiwoNode import CrownstoneYodiwoNode
+from CrownstoneYodiwo import CrownstoneNode
 
-node = CrownstoneYodiwoNode()
+node = CrownstoneNode()
 node.loadConfig('nodeConfig.json')
 node.start()
 

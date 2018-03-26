@@ -16,7 +16,7 @@ def getPortKey(key):
     return arr[-1]
 
 
-class CrownstoneYodiwoNode:
+class CrownstoneNode:
     indexedCrownstoneIds = []
     indexedLocationIds   = []
     

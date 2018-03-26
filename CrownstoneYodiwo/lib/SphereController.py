@@ -1,19 +1,11 @@
 import json
 
-from BluenetLib import BluenetEventBus
 from CrownstoneYodiwo.lib.Topics.Topics import Topics
-from Yodiwo.lib.plegma.Messages import PortEvent
-
 from CrownstoneYodiwo._EventBusInstance import CSEventBus
 
-from CrownstoneYodiwo.lib.ports.OutputPorts import OutputPorts
-
-from CrownstoneYodiwo.lib.ports.CombinedPorts import CombinedPorts
-from Yodiwo.lib.enums.Enums import IODirection, PortTypes
-
+from Yodiwo.Enums import PortConfig, PortTypes, IODirection
 from CrownstoneYodiwo.lib.ports.InputPorts import InputPorts
 from Yodiwo import ThingUIHints, ConfigParameter, Port, Thing
-from BluenetLib import Topics as BluenetTopics
 
 
 class SphereController:

@@ -8,10 +8,10 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Yodiwo==0.0.1',
-        'BluenetLib'
+        'BluenetLib==0.3.0'
     ],
     dependency_links=[
         'https://github.com/crownstone/yodiwo-python-node/tarball/master#egg=Yodiwo-0.0.1',
-        'https://github.com/crownstone/bluenet-python-lib/tarball/master#egg=BluenetLib-0.0.2'
+        'https://github.com/crownstone/bluenet-python-lib/tarball/0.3.0#egg=BluenetLib-0.3.0'
     ]
 )

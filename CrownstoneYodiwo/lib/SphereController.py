@@ -74,7 +74,7 @@ class SphereController:
                 PortTypes.JsonString,  # type
                 0,  # initial state
                 0,  # revNum            (?)
-                3  # ePortConf enum    (?)
+                0  # ePortConf enum    (?)
             )
         )
     
@@ -91,7 +91,7 @@ class SphereController:
         #         PortTypes.Boolean,  # type
         #         False,  # state     (?)
         #         0,  # revNum    (?)
-        #         3  # confFlags (?)
+        #         0   # confFlags (?)
         #     )
         # )
     
@@ -108,7 +108,7 @@ class SphereController:
         #         PortTypes.Decimal,  # data type
         #         0,  # initial state
         #         0,  # revNum            (?)
-        #         3  # ePortConf enum    (?)
+        #         0   # ePortConf enum    (?)
         #     )
         # )
     

@@ -75,7 +75,7 @@ class Location:
         #         PortTypes.Decimal,  # type
         #         0,                  # initial state
         #         0,                  # revNum            (?)
-        #         3                   # ePortConf enum    (?)
+        #         0                   # ePortConf enum    (?)
         #     )
         # )
         #
@@ -92,7 +92,7 @@ class Location:
         #         PortTypes.Decimal,  # type
         #         0,  # state     (?)
         #         0,  # revNum    (?)
-        #         3  # confFlags (?)
+        #         0  # confFlags (?)
         #     )
         # )
     
@@ -110,7 +110,7 @@ class Location:
                 PortTypes.JsonString,   # data type
                 "{}",                   # initial state
                 0,                   # revNum            (?)
-                3                    # ePortConf enum    (?)
+                0                    # ePortConf enum    (?)
             )
         )
         outputPortList.append(
@@ -122,7 +122,7 @@ class Location:
                 PortTypes.JsonString,  # data type
                 "{}",  # initial state
                 0,  # revNum            (?)
-                3  # ePortConf enum    (?)
+                0  # ePortConf enum    (?)
             )
         )
         

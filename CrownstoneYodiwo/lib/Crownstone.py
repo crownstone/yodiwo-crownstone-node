@@ -91,7 +91,7 @@ class Crownstone:
                 PortTypes.Decimal,  # type
                 0,                  # initial state
                 0,                  # revNum            (?)
-                3                   # ePortConf enum    (?)
+                0                   # ePortConf enum    (?)
             )
         )
         
@@ -107,8 +107,8 @@ class Crownstone:
                 IODirection.InputOutput,  # io direction
                 PortTypes.Boolean,  # type
                 False,  # state     (?)
-                0,  # revNum    (?)
-                3  # confFlags (?)
+                0,      # revNum    (?)
+                3       # confFlags (?)
             )
         )
     
@@ -126,7 +126,7 @@ class Crownstone:
                 PortTypes.Decimal,   # data type
                 0,                   # initial state
                 0,                   # revNum            (?)
-                3                    # ePortConf enum    (?)
+                0                    # ePortConf enum    (?)
             )
         )
         

@@ -3,7 +3,11 @@ Crownstone python node for the Yodiwo platform.
 
 To use this node, we expect the Crownstone USB dongle is connected to the device running this node.
 
-This node is written in Python 3 and required Python 3.5 or higher.
+This node is written in Python 3 and requires Python 3.5 or higher. For the installation process `setuptools` is required.
+
+```
+sudo apt install python3 python3-setuptools
+```
 
 To install the module run:
 

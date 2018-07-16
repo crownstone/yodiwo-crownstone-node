@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RUNTIME_DIRECTORY=/var/run/crownstone
+RUNTIME_DIRECTORY=$XDG_RUNTIME_DIR/crownstone
 
 PID_FILE=$RUNTIME_DIRECTORY/yodiwo-crownstone.pid
 

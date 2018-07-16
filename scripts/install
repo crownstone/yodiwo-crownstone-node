@@ -20,3 +20,6 @@ systemctl --user enable yodiwo-crownstone
 systemctl --user start yodiwo-crownstone
 systemctl --user status yodiwo-crownstone
 loginctl enable-linger $USER
+
+echo "In particular for the Yodiwo node, disable ModemManager."
+systemctl disable ModemManager.service

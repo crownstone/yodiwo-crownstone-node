@@ -6,6 +6,7 @@ Documentation=https://github.com/crownstone/yodiwo-crownstone-node
 Type=forking
 Environment=DISPLAY=:0
 RuntimeDirectory=crownstone
+RuntimeDirectoryMode=0755
 ExecStart=/usr/local/bin/yodiwo-crownstone.sh start
 
 [Install]

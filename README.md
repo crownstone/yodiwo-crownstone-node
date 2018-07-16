@@ -1,4 +1,5 @@
 # yodiwo-crownstone-node
+
 Crownstone python node for the Yodiwo platform. 
 
 To use this node, we expect the Crownstone USB dongle is connected to the device running this node.
@@ -117,4 +118,22 @@ node.start()
 ```
 
 Have fun!
+
+# Execution
+
+There are only a few steps:
+
+  cd conf
+  cp yodiwo-crownstone.conf.default yodiwo-crownstone.conf
+  # edit yodiwo-crownstone.conf with access details
+  cd scripts
+  sudo ./install
+
+You can test with `./run`.
+
+# Copyright
+
+For information about licensing and copyright, contact Crownstone (https://crownstone.rocks).
+
+
 

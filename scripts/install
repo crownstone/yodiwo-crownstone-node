@@ -1,6 +1,21 @@
 #!/bin/sh
 
+echo "Run this script from /scripts directory"
+
 cd ..
 
+# Install Crownstone Yodiwo python node
+echo "Install the CrownstoneYodiwo python library"
 python3 setup.py install
 
+echo "Install yodiwo-crownstone binary and configuration file"
+cp bin/yodiwo-crownstone.py /usr/local/bin/
+cp conf/yodiwo-crownstone.conf /etc/
+
+echo "Install service such that the Crownstone Yodiwo node is automatically started after a reboot"
+mkdir -p $HOME/.config/systemd/user
+cp yodiwo-crownstone.service $HOME/.config/systemd/user/
+systemctl --user enable yodiwo-crownstone
+systemctl --user start yodiwo-crownstone
+systemctl --user status yodiwo-crownstone
+loginctl enable-linger $(USER)

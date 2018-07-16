@@ -1,0 +1,11 @@
+[Unit]
+Description=Yodiwo Crownstone Service
+Documentation=https://github.com/crownstone/yodiwo-crownstone-node
+
+[Service]
+Type=forking
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/python3 /usr/local/bin/yodiwo-crownstone.py --configFile=/etc/yodiwo-crownstone.conf
+
+[Install]
+WantedBy=default.target

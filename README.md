@@ -123,11 +123,11 @@ Have fun!
 
 There are only a few steps:
 
-  cd conf
-  cp yodiwo-crownstone.conf.default yodiwo-crownstone.conf
-  # edit yodiwo-crownstone.conf with access details
-  cd scripts
-  sudo ./install
+    cd conf
+    cp yodiwo-crownstone.conf.default yodiwo-crownstone.conf
+    # edit yodiwo-crownstone.conf with access details
+    cd scripts
+    sudo ./install
 
 You can test with `./run`.
 

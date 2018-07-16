@@ -1,3 +1,5 @@
+#!/bin/python3
+
 from CrownstoneYodiwo import CrownstoneNode
 
 from pathlib import Path

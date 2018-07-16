@@ -17,5 +17,3 @@ if cFile.is_file():
         node.start()
 else:
         print("Error: File " + configFile + " does not exist")
-~                                                                                                                       
-~                                                                     

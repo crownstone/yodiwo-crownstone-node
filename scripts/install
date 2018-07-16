@@ -8,8 +8,9 @@ cd ..
 echo "Install the CrownstoneYodiwo python library"
 python3 setup.py install
 
-echo "Install yodiwo-crownstone binary and configuration file"
+echo "Install yodiwo-crownstone binary/startup scripts and configuration files"
 sudo cp bin/yodiwo-crownstone.py /usr/local/bin/
+sudo cp scripts/yodiwo-crownstone.sh /usr/local/bin/
 sudo cp conf/yodiwo-crownstone.conf /etc/
 
 echo "Install service such that the Crownstone Yodiwo node is automatically started after a reboot"

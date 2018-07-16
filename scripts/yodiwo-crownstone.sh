@@ -1,9 +1,8 @@
 #!/bin/bash
 
-mkdir /var/run/yodiwo
-chown $USER.$USER /var/run/yodiwo
+RUNTIME_DIRECTORY=/var/run/crownstone
 
-PID_FILE=/var/run/yodiwo/yodiwo-crownstone.pid
+PID_FILE=$RUNTIME_DIRECTORY/yodiwo-crownstone.pid
 
 case "$1" in 
 start)

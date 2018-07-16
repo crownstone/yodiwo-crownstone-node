@@ -19,4 +19,4 @@ cp scripts/yodiwo-crownstone.service $HOME/.config/systemd/user/
 systemctl --user enable yodiwo-crownstone
 systemctl --user start yodiwo-crownstone
 systemctl --user status yodiwo-crownstone
-loginctl enable-linger $(USER)
+loginctl enable-linger $USER

@@ -119,7 +119,7 @@ node.start()
 
 Have fun!
 
-# Execution
+# Execution / Deployment
 
 There are only a few steps:
 
@@ -130,6 +130,29 @@ There are only a few steps:
     sudo ./install
 
 You can test with `./run`.
+
+## Control syslog file size
+
+In your deployment setup you likely want to limit the log files, so they can't suddenly spin out of control if a process decides to spit out a huge amount of information:
+
+    sudo mkdir -p /etc/systemd/journald.conf.d
+    sudo vim /etc/systemd/journald.conf.d/size.conf
+
+Make sure the file has the following content:
+
+    [Journal]
+    SystemMaxUse=250M
+    SystemMaxFileSize=50M
+
+If there is too much information shown on Debug levels you can limit the logs to the Warning level:
+
+    sudo vim /etc/systemd/journald.conf.d/level.conf
+
+And contents:
+
+    [Journal]
+    # not save all levels but only 0 to 4
+    MaxLevelStore=warning
 
 # Copyright
 

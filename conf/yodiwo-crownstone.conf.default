@@ -1,0 +1,26 @@
+{
+  "crownstoneUser":{
+    "email":"",
+    "password":"",
+    "sha1Password":"",
+    "accessToken":"",
+    "sphereId":"",
+    "sphereName":""
+  },
+  "yodiwoUser":{
+    "ActiveID": "dev4cyan",
+    "Configs": {
+      "dev4cyan": {
+        "NodeKey": " ",
+        "NodeName": "PyNode",
+        "NodeSecret": "",
+        "MqttBrokerCertFile": null,
+        "MqttBrokerHostname": "dev4cyan.yodiwo.com",
+        "MqttUseSsl": true
+      }
+    }
+  },
+  "bluenet":{
+    "usbPort":"/dev/ttyACM0"
+  }
+}

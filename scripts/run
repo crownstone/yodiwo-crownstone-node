@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo "Run nohup run & if you want to have it run in the background even after exiting the shell."
+
+cd ../usage
+mkdir -p logs
+
+yodiwo_log="logs/Yodiwo $(date).log"
+
+echo "python3 usage/example.py > $yodiwo_log"
+python3 usage/example.py > "$yodiwo_log"
+

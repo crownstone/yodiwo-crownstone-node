@@ -1,4 +1,5 @@
 # yodiwo-crownstone-node
+
 Crownstone python node for the Yodiwo platform. 
 
 To use this node, we expect the Crownstone USB dongle is connected to the device running this node.
@@ -117,4 +118,45 @@ node.start()
 ```
 
 Have fun!
+
+# Execution / Deployment
+
+There are only a few steps:
+
+    cd conf
+    cp yodiwo-crownstone.conf.default yodiwo-crownstone.conf
+    # edit yodiwo-crownstone.conf with access details
+    cd scripts
+    sudo ./install
+
+You can test with `./run`.
+
+## Control syslog file size
+
+In your deployment setup you likely want to limit the log files, so they can't suddenly spin out of control if a process decides to spit out a huge amount of information:
+
+    sudo mkdir -p /etc/systemd/journald.conf.d
+    sudo vim /etc/systemd/journald.conf.d/size.conf
+
+Make sure the file has the following content:
+
+    [Journal]
+    SystemMaxUse=250M
+    SystemMaxFileSize=50M
+
+If there is too much information shown on Debug levels you can limit the logs to the Warning level:
+
+    sudo vim /etc/systemd/journald.conf.d/level.conf
+
+And contents:
+
+    [Journal]
+    # not save all levels but only 0 to 4
+    MaxLevelStore=warning
+
+# Copyright
+
+For information about licensing and copyright, contact Crownstone (https://crownstone.rocks).
+
+
 

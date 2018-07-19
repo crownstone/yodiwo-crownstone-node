@@ -1,0 +1,25 @@
+#!/bin/sh
+
+echo "Run this script from the ./scripts directory"
+
+cd ..
+
+# Install Crownstone Yodiwo python node
+echo "Install the CrownstoneYodiwo python library"
+python3 setup.py install
+
+echo "Install yodiwo-crownstone binary/startup scripts and configuration files"
+sudo cp bin/yodiwo-crownstone.py /usr/local/bin/
+sudo cp scripts/yodiwo-crownstone.sh /usr/local/bin/
+sudo cp conf/yodiwo-crownstone.conf /etc/
+
+echo "Install service such that the Crownstone Yodiwo node is automatically started after a reboot"
+mkdir -p $HOME/.config/systemd/user
+cp scripts/yodiwo-crownstone.service $HOME/.config/systemd/user/
+systemctl --user enable yodiwo-crownstone
+systemctl --user start yodiwo-crownstone
+systemctl --user status yodiwo-crownstone
+loginctl enable-linger $USER
+
+echo "In particular for the Yodiwo node, disable ModemManager."
+systemctl disable ModemManager.service

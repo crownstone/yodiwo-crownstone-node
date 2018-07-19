@@ -6,7 +6,8 @@ To use this node, we expect the [Crownstone USB dongle](https://shop.crownstone.
 
 ## Hardware preparation
 
-On the Cyient gateway, you will need the proper kernel drivers, update the module dependencies, and modprobe the module.
+On the Cyient gateway, you will need the proper kernel modules, update the module dependencies, and modprobe the module.
+The kernel modules are not available by default. Ask Cyient or Crownstone for the `cp201x.ko` module in particular.
 
     sudo cp usbserial.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial
     sudo cp cp201x.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial

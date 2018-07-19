@@ -7,6 +7,13 @@ To use this node, we expect the [Crownstone USB dongle](https://shop.crownstone.
 ## Hardware preparation
 
 On the Cyient gateway, you will need the proper kernel modules, update the module dependencies, and modprobe the module.
+
+You can access the hardware via SSH (ask account data from Cyient). If you do not want to depend on a changing IP address:
+    sudo arp-scan -l
+    # register MAC address, e.g. f8:dc:7a:19:0f:6d
+    cyient_ip=$(arp -a | grep f8:dc:7a:19:0f:6d | cut -f1 -d' ')
+    ssh linaro@$cyient_ip
+
 The kernel modules are not available by default. Ask Cyient or Crownstone for the `cp201x.ko` module in particular.
 
     sudo cp usbserial.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial

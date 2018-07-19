@@ -39,20 +39,22 @@ class CrownstoneNodeService(NodeService):
     def _receiveMessage(self, msg):
         for portevent in msg.PortEvents:
             selectedPort = None
-            
-            portevent = PortEvent(**portevent)
-            pk = portevent.PortKey
-            thingKey = Converter.PortkeyToThingkey(pk)
-            thing = self._Things[thingKey]
-            for p in thing.Ports:
-                if p.PortKey == pk:
-                    p.State = portevent.State
-                    selectedPort = getPortKey(pk)
-                    break
-
-            CSEventBus.emit(Topics.receivedMessage, {"thingKey":thingKey, "port": selectedPort, "payload":portevent.State})
-            
-            
+            portevent = PortEvent.fromCloud(portevent)
+            if portevent is not None:
+                pk = portevent.PortKey
+                thingKey = Converter.PortkeyToThingkey(pk)
+                if thingKey in self._Things:
+                    thing = self._Things[thingKey]
+                    for p in thing.Ports:
+                        if p.PortKey == pk:
+                            p.State = portevent.State
+                            selectedPort = getPortKey(pk)
+                            break
+    
+                    CSEventBus.emit(Topics.receivedMessage, {"thingKey": thingKey, "port": selectedPort, "payload": portevent.State})
+            else:
+                print("Invalid PortEvent [missing attributes]. Ignoring...")
+    
 
     def _sendMessage(self, msg):
         sequenceNumber = 1

@@ -1,8 +1,23 @@
 # yodiwo-crownstone-node
 
-Crownstone python node for the Yodiwo platform. 
+Crownstone Python node for the [Yodiwo platform](https://www.yodiwo.com/).
 
-To use this node, we expect the Crownstone USB dongle is connected to the device running this node.
+To use this node, we expect the [Crownstone USB dongle](https://shop.crownstone.rocks/products/crownstone-usb-dongle) is connected to the device running the Crownstone Python node.
+
+## Hardware preparation
+
+On the Cyient gateway, you will need the proper kernel drivers, update the module dependencies, and modprobe the module.
+
+    sudo cp usbserial.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial
+    sudo cp cp201x.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial
+    sudo depmod -a
+    sudo modprobe cp201x
+
+This should not lead to errors. If this works, edit `/etc/modules` and add `cp201x` on one of the lines.
+
+If you now plug-in the Crownstone USB dongle, you should see a device node in the `/dev` directory, for example `/dev/ttyUSB0`.
+
+## Software Prerequisites 
 
 This node is written in Python 3 and requires Python 3.5 or higher. For the installation process `setuptools` is required.
 
@@ -10,50 +25,18 @@ This node is written in Python 3 and requires Python 3.5 or higher. For the inst
 sudo apt install python3 python3-setuptools
 ```
 
-To install the module run:
+You will then need a configuration file. There is a template provided in the `./conf` folder.
 
-### Installation
+## Software Configuration
 
-```
-python3 setup.py install
-```
-
-You will then need to create a nodeConfig.json file. There is a template provided in the ./usage folder.
-
-### Config
-
-Lets try to create a config file! You can copy paste the template file in the ./usage folder and rename it to nodeConfig.json. Open it in a text editor.
+Copy template and open it a text editor:
 
 ```
-{
-  "crownstoneUser":{
-    "email":"",
-    "password":"",
-    "sha1Password":"",
-    "accessToken":"",
-    "sphereId":"",
-    "sphereName":""
-  },
-  "yodiwoUser":{
-    "ActiveID": "dev4cyan",
-    "Configs": {
-      "dev4cyan": {
-        "NodeKey": " ",
-        "NodeName": "PyNode",
-        "NodeSecret": "",
-        "MqttBrokerCertFile": null,
-        "MqttBrokerHostname": "dev4cyan.yodiwo.com",
-        "MqttUseSsl": true
-      }
-    }
-  },
-  "bluenet":{
-    "usbPort":"/dev/tty.SLAB_USBtoUART"
-  }
-}
+cd conf
+cp yodiwo-crownstone.conf.default yodiwo-crownstone.conf
 ```
 
-We start with the crownstoneUser field.
+Adjust the crownstoneUser field in `yodiwo-crownstone.conf`.
 
 ```
 "crownstoneUser":{
@@ -77,11 +60,11 @@ The Bluenet part:
 
 ```
 "bluenet":{
-    "usbPort":"/dev/tty.SLAB_USBtoUART"
+    "usbPort":"/dev/ttyUSB0"
 }
 ```
 
-Specifies on which port the user can find the Crownstone USB dongle. For more information on this, take a look at the bluenet lib [https://github.com/crownstone/bluenet-python-lib].
+This specifies on which port the user can find the Crownstone USB dongle. For more information on this, take a look at the bluenet lib [https://github.com/crownstone/bluenet-python-lib].
 
 Finally, the Yodiwo part:
 
@@ -103,35 +86,16 @@ Finally, the Yodiwo part:
 
 This is explained over at the Yodiwo python agent: [https://github.com/crownstone/yodiwo-python-node].
 
-### Running the node.
-
-When you have completed the installation and you have your config json, you can run the node. In the ./usage folder we have an example of how this is done.
-
-```python
-
-from CrownstoneYodiwo import CrownstoneNode
-
-node = CrownstoneNode()
-node.loadConfig('nodeConfig.json') # the path tho this config is relative to file containing this line of code
-node.start()
+## Software Installation
 
 ```
+cd scripts
+sudo ./install
+```
 
-Have fun!
+You can test with `./run` in the `scripts` directory.
 
-# Execution / Deployment
-
-There are only a few steps:
-
-    cd conf
-    cp yodiwo-crownstone.conf.default yodiwo-crownstone.conf
-    # edit yodiwo-crownstone.conf with access details
-    cd scripts
-    sudo ./install
-
-You can test with `./run`.
-
-## Control syslog file size
+## Operating System Optimization 
 
 In your deployment setup you likely want to limit the log files, so they can't suddenly spin out of control if a process decides to spit out a huge amount of information:
 
@@ -154,20 +118,6 @@ And contents:
     # not save all levels but only 0 to 4
     MaxLevelStore=warning
 
-## Gateway
-
-On the Cyient gateway, you will need the proper kernel drivers, update the module dependencies, and modprobe the module.
-
-    sudo cp usbserial.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial
-    sudo cp cp201x.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial
-    sudo depmod -a
-    sudo modprobe cp201x
-
-This should not lead to errors. If this works, edit `/etc/modules` and add `cp201x` on one of the lines.
-
 # Copyright
 
 For information about licensing and copyright, contact Crownstone (https://crownstone.rocks).
-
-
-

@@ -55,7 +55,7 @@ There are a few required fields in this config for the `crownstoneUser`.
 
 1. You can either (only one of these required) specify:
 - an `accessToken`;
-- an `email` address and `password` (that are used for the [Crownstone service](https://my.crownstone.rocks);
+- an `email` address and `password` (the ones which are used for the [Crownstone service](https://my.crownstone.rocks));
 - an `email` address and a `sha1` hash of your password (for example `abcde` is hashed to `03de6c570bfe24bfc328ccd7ca46b76eadaf4334`).
 
 2. For the sphere part (`sphereId`, `sphereName`) you have to specify (only one of these are required):

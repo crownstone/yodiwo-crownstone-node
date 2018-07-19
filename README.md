@@ -154,6 +154,17 @@ And contents:
     # not save all levels but only 0 to 4
     MaxLevelStore=warning
 
+## Gateway
+
+On the Cyient gateway, you will need the proper kernel drivers, update the module dependencies, and modprobe the module.
+
+    sudo cp usbserial.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial
+    sudo cp cp201x.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial
+    sudo depmod -a
+    sudo modprobe cp201x
+
+This should not lead to errors. If this works, edit `/etc/modules` and add `cp201x` on one of the lines.
+
 # Copyright
 
 For information about licensing and copyright, contact Crownstone (https://crownstone.rocks).

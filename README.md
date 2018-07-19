@@ -36,6 +36,8 @@ cd conf
 cp yodiwo-crownstone.conf.default yodiwo-crownstone.conf
 ```
 
+### Crownstone network configuration
+
 Adjust the crownstoneUser field in `yodiwo-crownstone.conf`.
 
 ```
@@ -49,12 +51,18 @@ Adjust the crownstoneUser field in `yodiwo-crownstone.conf`.
 }
 ```
 
-There are a few required fields in this config. For the user part (email, password, sha1Password, accessToken) You can either:
-- supply an accessToken
-- supply an email address and password (that are used for the Crownstone service [https://my.crownstone.rocks])
-- supply an email address and a sha1 hash of your password (like abcde is hashed to 03de6c570bfe24bfc328ccd7ca46b76eadaf4334)
+There are a few required fields in this config for the `crownstoneUser`. 
 
-For the sphere part (sphereId, sphereName) you can either specify an SphereId (which you can look up in the Crownstone Cloud) or just the name of your Sphere in the Crownstone app.
+1. You can either (only one of these required) specify:
+- an `accessToken`;
+- an `email` address and `password` (that are used for the [Crownstone service](https://my.crownstone.rocks);
+- an `email` address and a `sha1` hash of your password (for example `abcde` is hashed to `03de6c570bfe24bfc328ccd7ca46b76eadaf4334`).
+
+2. For the sphere part (`sphereId`, `sphereName`) you have to specify (only one of these are required):
+- a `SphereId` (which you can look up in the Crownstone Cloud);
+- or just the `name` of your Sphere (which you can look up in the Crownstone app).
+
+### Crownstone hardware configuration
 
 The Bluenet part:
 
@@ -64,7 +72,9 @@ The Bluenet part:
 }
 ```
 
-This specifies on which port the user can find the Crownstone USB dongle. For more information on this, take a look at the bluenet lib [https://github.com/crownstone/bluenet-python-lib].
+This specifies on which port the user can find the Crownstone USB dongle. For more information on this, take a look at the [bluenet lib](https://github.com/crownstone/bluenet-python-lib).
+
+### Yodiwo configuration
 
 Finally, the Yodiwo part:
 
@@ -84,7 +94,7 @@ Finally, the Yodiwo part:
 }
 ```
 
-This is explained over at the Yodiwo python agent: [https://github.com/crownstone/yodiwo-python-node].
+This is explained over at the [Yodiwo python agent](https://github.com/crownstone/yodiwo-python-node).
 
 ## Software Installation
 

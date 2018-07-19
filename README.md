@@ -104,7 +104,33 @@ cd scripts
 sudo ./install
 ```
 
-You can test with `./run` in the `scripts` directory.
+You can test beforehand with `./run` in the `scripts` directory.
+
+After installation you can check the status of the service:
+
+```
+systemctl --user status yodiwo-crownstone
+```
+
+This should return something like (with a green dot):
+
+```
+● yodiwo-crownstone.service - Yodiwo Crownstone Service
+   Loaded: loaded (/home/linaro/.config/systemd/user/yodiwo-crownstone.service; enabled; vendor preset: enabled)
+   Active: active (running) since Thu 2018-07-19 14:55:14 UTC; 28min ago
+     Docs: https://github.com/crownstone/yodiwo-crownstone-node
+  Process: 1558 ExecStart=/usr/local/bin/yodiwo-crownstone.sh start (code=exited, status=0/SUCCESS)
+ Main PID: 1559 (python3)
+   CGroup: /user.slice/user-1000.slice/user@1000.service/yodiwo-crownstone.service
+           └─1559 /usr/bin/python3 /usr/local/bin/yodiwo-crownstone.py --configFile=/etc/yodiwo-crownstone.conf
+
+```
+
+If you want to follow the most recent log entries, use:
+
+    tail -f /var/log/syslog
+
+If there is an issue you'll encounter it in that log.
 
 ## Operating System Optimization 
 
